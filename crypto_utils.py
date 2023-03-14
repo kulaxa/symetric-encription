@@ -20,26 +20,26 @@ def check_master_password(master_password) -> bool:
         return True
 
 
-def decrypt(address, ciphertext, master_password) -> str:
-    key = PBKDF2(bytes(master_password, 'utf-8'), bytes(address, 'utf-8'), 32, count=1000, hmac_hash_module=SHA512)
+def decrypt(address_hash, ciphertext, master_password) -> str:
+    key = PBKDF2(bytes(master_password, 'utf-8'), bytes(address_hash, 'utf-8'), 32, count=1000, hmac_hash_module=SHA512)
     nonce = ciphertext[:16]
-    tag = ciphertext[16:32]
-    ciphertext = ciphertext[32:]
+    ciphertext = ciphertext[16:]
     cipher = AES.new(key, AES.MODE_EAX, nonce=nonce)
     plaintext_padded = cipher.decrypt(ciphertext)
-    try:
-        cipher.verify(tag)
+    decrypted_address_hash = str(plaintext_padded, 'utf-8').split(":")[0]
+    if decrypted_address_hash == address_hash:
         plaintext = unpad(plaintext_padded, AES.block_size)
-    except ValueError:
+        decrypted_address_password = str(plaintext, 'utf-8').split(":")[1]
+    else:
         print("Key incorrect or message corrupted")
         exit(1)
-    return plaintext
+    return decrypted_address_password
 
 
-def encrypt(address, password, master_password) -> str:
-    key = PBKDF2(bytes(master_password, 'utf-8'), bytes(address, 'utf-8'), 32, count=1000, hmac_hash_module=SHA512)
+def encrypt(address_hash, password, master_password) -> str:
+    key = PBKDF2(bytes(master_password, 'utf-8'), bytes(address_hash, 'utf-8'), 32, count=1000, hmac_hash_module=SHA512)
     cipher = AES.new(bytes(key), AES.MODE_EAX)
     nonce = cipher.nonce # 16 bytes
-    ciphertext, tag= cipher.encrypt_and_digest(pad(bytes(password, 'utf-8'), AES.block_size))
-    ciphertext = nonce + tag + ciphertext
+    ciphertext = cipher.encrypt(pad(bytes(address_hash + ":" + password, 'utf-8'), AES.block_size))
+    ciphertext = nonce + ciphertext
     return ciphertext

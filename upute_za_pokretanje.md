@@ -18,4 +18,4 @@
 1. `python3 main.py put masterpassword adresa1 lozinka1`
 
 ### Dohvaćanje zapisa
-1. `python3 main.py get masterpassword adresa1`
+1. ` W`

@@ -36,7 +36,7 @@ if sys.argv[1] == 'get':
             print("No password stored for ", address)
             exit(1)
         decrypted_pass = decrypt(hash_address, r.get(hash_address), master_password)
-        print("Decrypted password: ", str(decrypted_pass, 'utf-8'))
+        print("Decrypted password: ", decrypted_pass)
     else:
         print("Wrong master password provided! Or database not initialized!")
         exit(1)
