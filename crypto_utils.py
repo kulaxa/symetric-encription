@@ -26,7 +26,11 @@ def decrypt(address_hash, ciphertext, master_password) -> str:
     ciphertext = ciphertext[16:]
     cipher = AES.new(key, AES.MODE_EAX, nonce=nonce)
     plaintext_padded = cipher.decrypt(ciphertext)
-    decrypted_address_hash = str(plaintext_padded, 'utf-8').split(":")[0]
+    try:
+        decrypted_address_hash = str(plaintext_padded, 'utf-8').split(":")[0]
+    except:
+        print("Key incorrect or message corrupted")
+        exit(1)
     if decrypted_address_hash == address_hash:
         plaintext = unpad(plaintext_padded, AES.block_size)
         decrypted_address_password = str(plaintext, 'utf-8').split(":")[1]

@@ -1,7 +1,7 @@
 import sys
-from Crypto.Hash import SHA256
 from crypto_utils import *
 from properties import *
+
 
 if sys.argv[1] == 'init':
     check_num_args(sys.argv, 3)
@@ -17,6 +17,9 @@ if sys.argv[1] == 'put':
     master_password = sys.argv[2]
     address = sys.argv[3]
     password = sys.argv[4]
+    if password.__contains__(":"):
+        print("You password can't contain :")
+        exit(1)
     hash_address = SHA256.new(data=bytes(address, 'utf-8')).hexdigest()
     if check_master_password(master_password):
         ciphertext = encrypt(hash_address, password, master_password);
@@ -40,3 +43,4 @@ if sys.argv[1] == 'get':
     else:
         print("Wrong master password provided! Or database not initialized!")
         exit(1)
+
