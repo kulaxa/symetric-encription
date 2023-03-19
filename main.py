@@ -17,10 +17,16 @@ if sys.argv[1] == 'put':
     master_password = sys.argv[2]
     address = sys.argv[3]
     password = sys.argv[4]
-    if password.__contains__(":"):
-        print("You password can't contain :")
+    if len(password) > 256:
+        print("Password can't be longer than 256 characters")
+        exit(1)
+    if password.__contains__(PASSWORD_DELIMITER):
+        print("You password can't contain ", PASSWORD_DELIMITER)
         exit(1)
     hash_address = SHA256.new(data=bytes(address, 'utf-8')).hexdigest()
+    if address == INIT_ADDRESS:
+        print("You can't use ", INIT_ADDRESS, " as address")
+        exit(1)
     if check_master_password(master_password):
         ciphertext = encrypt(hash_address, password, master_password);
         r.set(hash_address, ciphertext)
